@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight, CircleCheck, Code2, Layers3, Menu, MonitorSmartphone, ShoppingBag, Sparkles, X, Zap } from "lucide-react";
 import { generalMessage, siteConfig, whatsappLink } from "@/config";
+import { Link } from "react-router-dom";
 
 const images = {
   interior: "https://images.pexels.com/photos/15867753/pexels-photo-15867753.png?auto=compress&cs=tinysrgb&w=1400",
@@ -29,10 +30,62 @@ const projects = [
 ];
 const filters = ["All Projects", "Business Websites", "E-commerce", "Web Applications", "Landing Pages"];
 const plans = [
-  { name: "Basic", price: "₹6,999", intro: "For businesses ready to get online.", features: ["Up to 5 pages", "Responsive design", "WhatsApp integration", "Contact form", "Basic SEO"] },
-  { name: "Professional", price: "₹9,999", intro: "For businesses ready to stand out.", features: ["Up to 8 pages", "Premium custom design", "Product/service showcase", "WhatsApp integration", "Contact form", "Basic SEO", "Google Maps integration"], recommended: true },
-  { name: "Premium", price: "₹16,999", intro: "For businesses ready to grow bigger.", features: ["Up to 12 pages", "Advanced custom UI/UX", "Product catalogue", "Advanced forms", "SEO setup", "Analytics integration", "Additional integrations as scoped"] },
-];
+  {
+  name: "Landing Page",
+  price: "₹3,999",
+  intro: "Perfect for businesses that need a strong online presence.",
+  features: [
+    "Single-page website",
+    "Modern responsive design",
+    "Hero section with CTA",
+    "About and services sections",
+    "WhatsApp integration",
+    "Contact form",
+    "Basic SEO"
+  ]
+},
+{
+  name: "Basic",
+  price: "₹6,999",
+  intro: "For businesses ready to get online.",
+  features: [
+    "Up to 5 pages",
+    "Responsive design",
+    "WhatsApp integration",
+    "Contact form",
+    "Basic SEO"
+  ]
+},
+{
+  name: "Professional",
+  price: "₹9,999",
+  intro: "For businesses ready to stand out.",
+  features: [
+    "Up to 8 pages",
+    "Premium custom design",
+    "Product/service showcase",
+    "WhatsApp integration",
+    "Contact form",
+    "Basic SEO",
+    "Google Maps integration"
+  ],
+  recommended: true
+},
+{
+  name: "Premium",
+  price: "₹16,999",
+  intro: "For businesses ready to grow bigger.",
+  features: [
+    "Up to 12 pages",
+    "Advanced custom UI/UX",
+    "Product catalogue",
+    "Advanced forms",
+    "SEO setup",
+    "Analytics integration",
+    "Additional integrations as scoped"
+  ]
+}
+ ];
 const faqs = [
   ["How much does a business website cost?", "Our business website packages start at ₹6,999. The final quote depends on your requirements, content, integrations and project scope."],
   ["How long does it take to develop a website?", "A typical business website can take a few weeks. The timeline depends on the scope, feedback and how quickly content is ready; we’ll agree on a schedule before starting."],
@@ -49,6 +102,31 @@ function WhatsAppIcon({ size = 23 }: { size?: number }) { return <svg width={siz
 function Brand() { return <button className="brand" onClick={() => scrollTo("home")} aria-label={`${siteConfig.name}, back to home`}><span className="brand-mark"><span></span><span></span><span></span><span></span></span><span>digital<span className="brand-light">studio</span><small>CREATIVE DIGITAL AGENCY</small></span></button>; }
 function WAButton({ message = generalMessage, children, className = "button button-dark" }: { message?: string; children: React.ReactNode; className?: string }) { return <a className={className} href={whatsappLink(message)} target="_blank" rel="noreferrer">{children}<ArrowUpRight size={16}/></a>; }
 function SectionIntro({ eyebrow, title, text, light = false }: { eyebrow: string; title: string; text?: string; light?: boolean }) { return <div className={`section-intro ${light ? "light" : ""}`}><div className="eyebrow"><span></span>{eyebrow}</div><h2>{title}</h2>{text && <p>{text}</p>}</div>; }
+
+type Project = (typeof projects)[number];
+
+function ProjectCard({ project, index, duplicate, onPreview }: { project: Project; index: number; duplicate: boolean; onPreview: (project: Project) => void }) {
+  const tabIndex = duplicate ? -1 : undefined;
+  return <article className="project-card" aria-hidden={duplicate}>
+    <div className={`project-image project-bg-${index % 4} ${project.kind === "live" ? `live-project live-${project.visual}` : ""}`}>
+      {project.kind === "live"
+        ? <div className="live-art"><span className="live-art-kicker">{project.industry}</span><strong>{project.visual === "deep" ? "Learn any language.\nOne platform." : project.visual === "hardware" ? "ALIGARH\nHARDWARE" : "MOVE GOODS.\nMOVE FORWARD."}</strong><span className="live-art-bottom">{project.visual === "deep" ? "HTML · CSS · JAVASCRIPT · AND MORE" : project.visual === "hardware" ? "LOCKS · HARDWARE · WHOLESALE" : "TRANSPORT · WAREHOUSING · SHIPPING"}</span></div>
+        : <button className="project-browser project-preview-button" onClick={() => onPreview(project)} aria-label={`View ${project.name} concept preview`} tabIndex={tabIndex}><div className="tiny-browser"><span>● ● ●</span><small>CONCEPT PREVIEW</small><span>↗</span></div><WebsitePreview visual={project.visual} /></button>}
+      {project.kind === "live"
+        ? <Link to={project.url} tabIndex={tabIndex}><span className="project-status live">LIVE PROJECT ↗</span></Link>
+        : <button className="project-status concept" onClick={() => onPreview(project)} tabIndex={tabIndex}>CONCEPT PROJECT · VIEW ↗</button>}
+    </div>
+    <div className="project-info">
+      <div><span className="project-category">{project.industry} <b>·</b> {project.kind === "live" ? "LIVE" : "CONCEPT"}</span><h3>{project.name}</h3><p>{project.desc}</p><small>{project.tech}</small></div>
+      <div className="project-actions">
+        {project.kind === "live"
+          ? <a href={project.url} target="_blank" rel="noreferrer" tabIndex={tabIndex}>Visit Live Site <ArrowUpRight size={15} /></a>
+          : <button onClick={() => onPreview(project)} tabIndex={tabIndex}>View Concept <ArrowUpRight size={15} /></button>}
+        <a href={whatsappLink(`Hello! I would like to discuss a project similar to ${project.name}. Please share details about your process and pricing.`)} target="_blank" rel="noreferrer" tabIndex={tabIndex}>Order a Similar Project <ArrowUpRight size={15} /></a>
+      </div>
+    </div>
+  </article>;
+}
 
 function WebsitePreview({ visual, large = false, eager = false }: { visual: string; large?: boolean; eager?: boolean }) {
   if (visual === "dashboard") return <div className={`website-preview dashboard-preview ${large ? "large" : ""}`}><div className="dash-sidebar"><b>◈</b><span>OVERVIEW</span><i></i><i></i><i></i><i></i></div><div className="dash-main"><div className="dash-top">Overview <span>● &nbsp; Admin</span></div><small>WELCOME BACK</small><h4>Your business at a glance.</h4><div className="dash-stats"><div><small>Total revenue</small><b>₹ 84,250</b><em>↗ 12.5%</em></div><div><small>Active projects</small><b>24</b><em>↗ 8.2%</em></div><div><small>New enquiries</small><b>128</b><em>↗ 16.4%</em></div></div><div className="chart"><span>Performance overview</span><div className="chart-bars">{[36,55,44,68,57,75,65,88,72,96,79,100].map((n,i)=><i key={i} style={{height:`${n}%`}}/>)}</div></div></div></div>;
@@ -91,11 +169,16 @@ export default function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [filter, setFilter] = useState("All Projects");
+  const [projectDirection, setProjectDirection] = useState<"normal" | "reverse">("normal");
   const [demo, setDemo] = useState<(typeof projects)[number] | null>(null);
   const [formStatus, setFormStatus] = useState<"idle" | "loading" | "opened" | "error">("idle");
   useEffect(() => { document.title = `${siteConfig.name} | Websites Built for Business Growth`; const onScroll = () => setScrolled(window.scrollY > 20); window.addEventListener("scroll", onScroll); return () => window.removeEventListener("scroll", onScroll); }, []);
   useEffect(() => { if (!demo) return; const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setDemo(null); }; document.body.style.overflow = "hidden"; window.addEventListener("keydown", closeOnEscape); return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", closeOnEscape); }; }, [demo]);
   const nav = [["Home", "home"], ["Services", "services"], ["Our Work", "work"], ["Pricing", "pricing"], ["About", "about"], ["Contact", "contact"]];
+  const visibleProjects = projects.filter(project => filter === "All Projects" || project.category === filter);
+  const marqueeProjects = visibleProjects.length === 1
+    ? [...visibleProjects, ...visibleProjects, ...visibleProjects]
+    : visibleProjects;
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -115,10 +198,95 @@ export default function Index() {
       <section className="hero"><div className="hero-grid wrap"><div className="hero-copy"><div className="hero-badge"><span className="badge-dot"></span> YOUR DIGITAL GROWTH PARTNER</div><h1>Build Your Digital Presence.<br/><em>Grow Your Business.</em></h1><p>We design and develop powerful websites and custom digital solutions that help businesses stand out, connect with customers and grow online.</p><div className="hero-actions"><WAButton>Get a Free Consultation</WAButton><button className="button button-outline" onClick={()=>scrollTo("services")}>Explore Our Services <ArrowRight size={16}/></button></div><div className="hero-trust"><div><CircleCheck/><span>Custom-Built<br/>Websites</span></div><div><CircleCheck/><span>Mobile-First<br/>Experiences</span></div><div><CircleCheck/><span>Business-Focused<br/>Solutions</span></div></div></div><div className="hero-art"><div className="art-orbit orbit-one"></div><div className="art-orbit orbit-two"></div><div className="art-label"><Sparkles size={14}/> DESIGNED TO MAKE AN IMPACT</div><div className="desktop-device"><div className="browser-bar"><span><i></i><i></i><i></i></span><div>formandfield.com</div><span>⌕</span></div><WebsitePreview visual="furniture" eager/></div><div className="device-stand"></div><div className="phone-device"><div className="phone-speaker"></div><WebsitePreview visual="furniture"/></div><div className="art-note"><span className="note-icon"><ArrowUpRight size={19}/></span><span><b>Made to grow.</b><small>Designed for every screen.</small></span></div><div className="art-index">01 / DIGITAL EXPERIENCES</div></div></div><div className="hero-bottom wrap"><span>SCROLL TO EXPLORE</span><ArrowDown size={15}/><span className="hero-bottom-right">JAMNAGAR, GUJARAT · WORKING ACROSS INDIA</span></div></section>
       <div className="ticker"><div className="wrap ticker-inner"><span>GOOD DESIGN IS GOOD BUSINESS</span><i></i><span>STRATEGY</span><b>✳</b><span>DESIGN</span><b>✳</b><span>DEVELOPMENT</span><b>✳</b><span>GROWTH</span><span className="ticker-end">MADE WITH PURPOSE ↗</span></div></div>
       <section className="section services-section" id="services"><div className="wrap"><div className="split-heading"><SectionIntro eyebrow="WHAT WE DO" title="Everything Your Business Needs to Grow Digitally." text="From your first business website to advanced digital platforms, we bring your ideas to life."/><div className="heading-aside"><span>01 — 05</span><p>Thoughtful digital solutions,<br/>built around your business.</p></div></div><div className="service-grid">{services.map((service)=><article className="service-card" key={service.title}><div className="service-top"><span className="service-icon"><service.icon size={23}/></span><span>{service.number} / 05</span></div><h3>{service.title}</h3><p>{service.desc}</p><ul>{service.features.map(feature=><li key={feature}><Check size={14}/>{feature}</li>)}</ul><div className="service-footer"><div><small>STARTING FROM</small><strong>{service.price}</strong></div><WAButton message={service.message} className="round-link"><span className="sr-only">Discuss {service.title}</span></WAButton></div><WAButton message={service.message} className="service-text-link">Discuss Your Project</WAButton></article>)}</div></div></section>
-      <section className="section work-section" id="work"><div className="wrap"><div className="split-heading"><SectionIntro eyebrow="SELECTED PROJECTS" title="Explore Our Recent Work" text="Explore live platforms and clearly labeled concepts across learning, wholesale, logistics and more."/><p className="concept-note"><span>✳</span> Live projects link to their websites. Concept projects are illustrative, not client work.</p></div><div className="project-gallery-heading"><span>{projects.filter(p=>filter === "All Projects" || p.category === filter).length} PROJECTS</span><div><span>SCROLL TO EXPLORE</span><button onClick={()=>document.querySelector(".project-grid")?.scrollBy({left:-420,behavior:"smooth"})} aria-label="Scroll projects left"><ChevronLeft size={18}/></button><button onClick={()=>document.querySelector(".project-grid")?.scrollBy({left:420,behavior:"smooth"})} aria-label="Scroll projects right"><ChevronRight size={18}/></button></div></div><div className="filters" aria-label="Filter projects">{filters.map(item=><button className={filter === item ? "active" : ""} onClick={()=>setFilter(item)} key={item}>{item}</button>)}</div><div className="project-grid">{projects.filter(p=>filter === "All Projects" || p.category === filter).map((project, index)=><article className="project-card" key={project.name}><div className={`project-image project-bg-${index % 4} ${project.kind === "live" ? `live-project live-${project.visual}` : ""}`}>{project.kind === "live" ? <div className="live-art"><span className="live-art-kicker">{project.industry}</span><strong>{project.visual === "deep" ? "Learn any language.\nOne platform." : project.visual === "hardware" ? "ALIGARH\nHARDWARE" : "MOVE GOODS.\nMOVE FORWARD."}</strong><span className="live-art-bottom">{project.visual === "deep" ? "HTML · CSS · JAVASCRIPT · AND MORE" : project.visual === "hardware" ? "LOCKS · HARDWARE · WHOLESALE" : "TRANSPORT · WAREHOUSING · SHIPPING"}</span></div> : <button className="project-browser project-preview-button" onClick={()=>setDemo(project)} aria-label={`View ${project.name} concept preview`}><div className="tiny-browser"><span>● ● ●</span><small>CONCEPT PREVIEW</small><span>↗</span></div><WebsitePreview visual={project.visual}/></button>}{project.kind === "live" ? <span className="project-status live">LIVE PROJECT ↗</span> : <button className="project-status concept" onClick={()=>setDemo(project)}>CONCEPT PROJECT · VIEW ↗</button>}</div><div className="project-info"><div><span className="project-category">{project.industry} <b>·</b> {project.kind === "live" ? "LIVE" : "CONCEPT"}</span><h3>{project.name}</h3><p>{project.desc}</p><small>{project.tech}</small></div><div className="project-actions">{project.kind === "live" ? <a href={project.url} target="_blank" rel="noreferrer">Visit Live Site <ArrowUpRight size={15}/></a> : <button onClick={()=>setDemo(project)}>View Concept <ArrowUpRight size={15}/></button>}<a href={whatsappLink(`Hello! I would like to discuss a project similar to ${project.name}. Please share details about your process and pricing.`)} target="_blank" rel="noreferrer">Order a Similar Project <ArrowUpRight size={15}/></a></div></div></article>)}</div></div></section>
+      <section className="section work-section" id="work">
+        <div className="wrap">
+          <div className="split-heading">
+            <SectionIntro eyebrow="SELECTED PROJECTS" title="Explore Our Recent Work" text="Explore live platforms and clearly labeled concepts across learning, wholesale, logistics and more." />
+            <p className="concept-note"><span>✳</span> Live projects link to their websites. Concept projects are illustrative, not client work.</p>
+          </div>
+          <div className="project-gallery-heading">
+            <span>{visibleProjects.length} PROJECTS</span>
+            <div>
+              <span>SCROLL TO EXPLORE</span>
+              <button onClick={() => setProjectDirection("reverse")} aria-label="Move projects right"><ChevronLeft size={18} /></button>
+              <button onClick={() => setProjectDirection("normal")} aria-label="Move projects left"><ChevronRight size={18} /></button>
+            </div>
+          </div>
+          <div className="filters" aria-label="Filter projects">
+            {filters.map(item => <button className={filter === item ? "active" : ""} onClick={() => setFilter(item)} key={item}>{item}</button>)}
+          </div>
+          <div className="project-grid">
+            <div className="project-track" style={{ animationDirection: projectDirection }}>
+              {[0, 1].map(copy => (
+                <div className="project-group" key={copy} aria-hidden={copy === 1} inert={copy === 1}>
+                  {marqueeProjects.map((project, index) => (
+                    <ProjectCard key={`${copy}-${index}-${project.name}`} project={project} index={index} duplicate={copy === 1 || (visibleProjects.length === 1 && index > 0)} onPreview={setDemo} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       <section className="section why-section" id="about"><div className="wrap why-grid"><div><SectionIntro eyebrow="THE DIGITAL STUDIO DIFFERENCE" title="Good work starts with a better partnership." text="We believe your website should do more than look good. It should work hard for your business, today and as you grow." light/><WAButton className="button button-lime">Let’s Work Together</WAButton></div><div className="why-list">{[["01","Custom Solutions","Built around your goals, never squeezed into a template."],["02","Modern Technology","Reliable, scalable tools chosen for the job at hand."],["03","Mobile-First Design","A seamless experience on every screen."],["04","Transparent Pricing","Clear conversations and thoughtful solutions for your budget."],["05","Ongoing Support","A partner to help you keep moving after launch."]].map(([n,title,desc])=><div className="why-item" key={n}><span>{n}</span><div><h3>{title}</h3><p>{desc}</p></div><ArrowUpRight size={18}/></div>)}</div></div><div className="why-watermark">BUILT WITH PURPOSE.</div></section>
-      <section className="section pricing-section" id="pricing"><div className="wrap"><div className="center-heading"><SectionIntro eyebrow="STRAIGHTFORWARD PRICING" title="Simple and Transparent Pricing" text="The right starting point for wherever your business is headed."/></div><div className="pricing-grid">{plans.map(plan=><article className={`price-card ${plan.recommended ? "recommended" : ""}`} key={plan.name}>{plan.recommended && <div className="recommend-label">MOST POPULAR <Sparkles size={13}/></div>}<span className="plan-name">{plan.name}</span><p>{plan.intro}</p><div className="price">{plan.price}<small> / starting at</small></div><div className="price-divider"></div><span className="included">WHAT’S INCLUDED</span><ul>{plan.features.map(f=><li key={f}><CircleCheck size={16}/>{f}</li>)}</ul><WAButton message={`Hello! I am interested in the ${plan.name} website package starting at ${plan.price}. Please share more details.`} className={`button ${plan.recommended ? "button-lime" : "button-outline"}`}>Get This Package</WAButton></article>)}</div><p className="pricing-note">Final pricing depends on project requirements. Domain, hosting, GST, content and maintenance inclusions will be confirmed in the quotation.</p></div></section>
-      <section className="section process-section"><div className="wrap"><div className="split-heading"><SectionIntro eyebrow="HOW WE WORK" title="From Idea to Launch — Our Simple Process" text="A clear, collaborative journey from the first conversation to the final click."/><div className="heading-aside"><span>THE PROCESS</span><p>Good things happen<br/>step by step.</p></div></div><div className="process-grid">{[["01","Discovery","Understand business goals and requirements."],["02","Planning & Design","Prepare website structure and UI/UX."],["03","Development","Build using modern technologies."],["04","Testing","Test responsiveness, functionality and performance."],["05","Launch","Deploy and hand over the project."],["06","Support","Provide ongoing technical assistance."]].map(([n,title,desc])=><div className="process-step" key={n}><div className="process-number">{n}</div><h3>{title}</h3><p>{desc}</p></div>)}</div></div></section>
+     <section className="section pricing-section" id="pricing">
+  <div className="wrap">
+    <div className="center-heading">
+      <SectionIntro
+        eyebrow="STRAIGHTFORWARD PRICING"
+        title="Simple and Transparent Pricing"
+        text="The right starting point for wherever your business is headed."
+      />
+    </div>
+
+    <div className="pricing-grid">
+      {plans.map((plan) => (
+        <article
+          key={plan.name}
+          className={`price-card ${plan.recommended ? "recommended" : ""}`}
+        >
+          {plan.recommended && (
+            <div className="recommend-label">
+              MOST POPULAR <Sparkles size={13} />
+            </div>
+          )}
+
+          <h3 className="plan-name">{plan.name}</h3>
+          <p className="plan-intro">{plan.intro}</p>
+
+          <div className="price-block">
+            <small>Starting at</small>
+            <div className="price">{plan.price}</div>
+          </div>
+
+          <div className="price-divider" />
+
+          <span className="included">WHAT’S INCLUDED</span>
+          <ul className="feature-list">
+            {plan.features.map((f) => (
+              <li key={f}>
+                <CircleCheck size={16} className="check-icon" />
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+
+          <WAButton
+            message={`Hello! I am interested in the ${plan.name} website package starting at ${plan.price}. Please share more details.`}
+            className={`button ${plan.recommended ? "button-lime" : "button-outline"}`}
+          >
+            Get This Package
+          </WAButton>
+        </article>
+      ))}
+    </div>
+
+    <p className="pricing-note">
+      Final pricing depends on project requirements. Domain, hosting, GST,
+      content and maintenance inclusions will be confirmed in the quotation.
+    </p>
+  </div>
+</section> <section className="section process-section"><div className="wrap"><div className="split-heading"><SectionIntro eyebrow="HOW WE WORK" title="From Idea to Launch — Our Simple Process" text="A clear, collaborative journey from the first conversation to the final click."/><div className="heading-aside"><span>THE PROCESS</span><p>Good things happen<br/>step by step.</p></div></div><div className="process-grid">{[["01","Discovery","Understand business goals and requirements."],["02","Planning & Design","Prepare website structure and UI/UX."],["03","Development","Build using modern technologies."],["04","Testing","Test responsiveness, functionality and performance."],["05","Launch","Deploy and hand over the project."],["06","Support","Provide ongoing technical assistance."]].map(([n,title,desc])=><div className="process-step" key={n}><div className="process-number">{n}</div><h3>{title}</h3><p>{desc}</p></div>)}</div></div></section>
       <section className="tech-section"><div className="wrap tech-inner"><div><div className="eyebrow"><span></span> BUILT WITH THE BEST</div><h2>Modern tools.<br/>Meaningful results.</h2></div><div className="tech-grid">{[["React.js", "react"], ["Next.js", "nextdotjs"], ["Node.js", "nodedotjs"], ["Express.js", "express"], ["NestJS", "nestjs"], ["MongoDB", "mongodb"], ["PostgreSQL", "postgresql"], ["Tailwind CSS", "tailwindcss"], ["TypeScript", "typescript"], ["AWS", "aws"]].map(([tech, icon])=><div key={tech}><img src={icon === "aws" ? "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg" : `https://cdn.simpleicons.org/${icon}/789b3e`} alt="" loading="lazy"/>{tech}</div>)}</div></div></section>
       <section className="section testimonial-section"><div className="wrap testimonial-inner"><div><div className="eyebrow"><span></span> KIND WORDS, COMING SOON</div><h2>Great partnerships.<br/><em>Great stories.</em></h2></div><div className="quote-placeholder"><span>“</span><p>We’re looking forward to sharing genuine words from the businesses we work with.</p><small>CLIENT STORIES WILL APPEAR HERE</small></div></div></section>
       <section className="section faq-section"><div className="wrap faq-grid"><div><SectionIntro eyebrow="GOOD TO KNOW" title="Questions? We’ve got answers." text="A few things you might be wondering before we get started."/><WAButton className="text-link">Have another question?</WAButton></div><div className="faq-list">{faqs.map(([question,answer])=><details key={question}><summary>{question}<ChevronDown size={19}/></summary><p>{answer}</p></details>)}</div></div></section>
